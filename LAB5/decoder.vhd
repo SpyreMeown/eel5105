@@ -1,3 +1,5 @@
+--4 bits para 7seg
+
 library IEEE;
 use IEEE.std_Logic_1164.all;
 
