@@ -1,56 +1,54 @@
-library ieee;
-use ieee.Std_logic_1164.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+------------------------------------------------------------------------------
 
 entity topo is
-port    (SW: in std_logic_vector(9 downto 0);
-               LEDR: out std_logic_vector(3 downto 0);
-               HEX0: out std_logic_vector(6 downto 0)
-               );
+
+port (SW: in std_logic_vector(9 downto 0); --switches da placa
+		LEDR: out std_logic_vector (9 downto 0); -- LEDS
+		HEX0: out std_logic_vector(6 downto 0) -- display de 7-seg // apenas LED(0) e SW(3 downto 1) utilizados
+);
+
 end topo;
+	
+------------------------------------------------------------------------------
+	
+architecture circuitotopo of topo is 
 
-architecture bhvr_topo of topo is
+signal mux_output: std_logic_vector (3 downto 0);
+signal complement_2_output: std_logic_vector(3 downto 0);
 
-signal F1, F2, F3, F4, F, G: std_logic_vector(3 downto 0);
+component decoder 
 
-component circuito1 is
-port    (A: in std_logic_vector (2 downto 0);
-               B: in std_logic_vector (2 downto 0);
-               F1 : out std_logic_vector(3 downto 0);
-               F2 : out std_logic_vector(3 downto 0);
-               F3 : out std_logic_vector(3 downto 0);
-               F4 : out std_logic_vector(3 downto 0)
-               );
- end component;
-
-component sum is
-port	(A: in std_logic_vector(3 downto 0);
-             B: in std_logic_vector(3 downto 0);
-             F: out std_logic_vector(3 downto 0)
-             );
+port (C: in std_logic_vector(3 downto 0);
+		F: out std_logic_vector(6 downto 0)
+);
 end component;
 
-component mux is
-port    (F1           : in std_logic_vector(3 downto 0);
-               F2           : in std_logic_vector(3 downto 0);
-               F3           : in std_logic_vector(3 downto 0);
-               F4           : in std_logic_vector(3 downto 0);
-               Control: in std_logic_vector(1 downto 0);
-               F              : out std_logic_vector(3 downto 0)
-               );
+component multiplexer_4x1  
+port (multiplexer_input_0: in std_logic_vector(3 downto 0);
+		  multiplexer_input_1: in std_logic_vector(3 downto 0);
+		  multiplexer_output : out std_logic_vector(3 downto 0);
+		  control_signal     : in std_logic
+);  
+
 end component;
 
-component decod7seg is
-port    (A: in std_logic_vector(3 downto 0);
-               F: out std_logic_vector(6 downto 0)
-               );
- end component;
-
+component complement_2 
+port (X: in std_logic_vector(3 downto 0);
+      Y: out std_logic_vector(3 downto 0)
+);
+ 
+end component;
 begin
 
-SUMT                   : sum port map(F1, F, G);
-MUXT                  : mux port map(F1, F2, F3, F4, SW(9 downto 8),  F);
-CIRCUITO1T     : circuito1 port map(SW(2 downto 0), SW (6 downto 4),  F1, F2, F3, F4);
-DECOD7SEGT  : decod7seg port map(G, HEX0);
-LEDR <= G;
-
-end bhvr_topo;
+decodificador: decoder port map (mux_output, HEX0); 
+  
+multiplexer: multiplexer_4x1 port map (SW(3 downto 0), complement_2_output, mux_output, SW(3));
+  
+Complemento2: complement_2 port map (SW(3 downto 0), complement_2_output);
+  
+LEDR(0)<= SW(3); -- acende caso o bit mais significativo seja 1.
+end architecture;
+ 
