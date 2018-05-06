@@ -1,0 +1,52 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity calculadora8 is
+
+port(SW: in std_logic_vector(9 downto 0);
+		KEY: in std_logic_vector(1 downto 0);
+		CLOCK_50: in std_logic;
+		LEDR: out std_logic_vector(9 downto 0);
+		HEX0: out std_logic_vector(6 downto 0);
+		HEX1: out std_logic_vector(6 downto 0)
+);
+end calculadora8;
+
+architecture calculadora of calculadora8 is
+
+signal A, S, OUT_REGISTER_2: std_logic_vector(7 downto 0);
+component somasub is
+port (A: in std_logic_vector(7 downto 0); -- 8 bits, 4 no original
+		B: in std_logic_vector(7 downto 0);
+		C: in std_logic_vector(1 downto 0);
+		S: out std_logic_vector(7 downto 0);
+		Overflow: out std_logic
+);
+end component;
+
+component decodC2to7seg is
+port (Y:in std_logic_vector(7 downto 0);
+HEX0: out std_logic_vector(6 downto 0);
+HEX1: out std_logic_vector(6 downto 0)
+);
+end component;
+
+component reg8 is
+port(CLK: in std_logic;
+	 EN: in std_logic;
+	 D: in std_logic_vector(7 downto 0);
+	 Q: out std_logic_vector(7 downto 0)
+);
+end component;
+
+begin
+
+REG1: reg8 port map(CLOCK_50, KEY(0), SW(7 downto 0), A);
+
+soma8: somasub port map(A, SW(7 downto 0), SW(9 downto 8), S, LEDR(9));
+
+REG2: reg8 port map(CLOCK_50, KEY(1), S, OUT_REGISTER_2);
+
+to7SEG: decodC2to7seg port map(OUT_REGISTER_2, HEX1, HEX0);
+
+end calculadora; 
