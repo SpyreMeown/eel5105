@@ -1,1 +1,1 @@
->NÃO< usar esse arquivo pra NADA. Ele >NÃO< está terminado.
+>>NÃO< usar esse projeto pra NADA. Ele >NÃO< está terminado.
