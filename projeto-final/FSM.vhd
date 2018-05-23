@@ -1,5 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all; 
+--para o contador
+use ieee.std_logic_unsigned.all;
 
 ---------------------------------------------------------------------
 
@@ -40,6 +42,10 @@ signal EAtual, PEstado: STATES;
 signal BUTTON: std_logic_vector(3 downto 0);
 signal SAIDA_ROM: std_logic_vector(9 downto 0);
 
+-- coisas do contador
+signal C1Hz: std_logic;
+signal cont: std_logic_vector(27 downto 0);
+
 ---------------------------------------------------------------------
 
 begin
@@ -52,10 +58,17 @@ ROM: memoria port map(SW(9 downto 6), SAIDA_ROM(9 downto 0));
 		begin
 			if(KEY(0) = '0') then
 				EAtual <= start;
-			elsif(CLOCK_50' AND CLOCK_50 = '1') then
-			EAtual <= PEstado
-			end if
-	end process
+			cont <= cont + 1;
+				if cont = x"2FAF07F" then
+					cont <= x"0000000";
+						C1Hz <= '1';
+						AEstado <= PEstado;
+
+					else
+						C1Hz <= '0';
+				end if;
+			end if;
+	end process;
 	
 ---------------------------------------------------------------------
 
